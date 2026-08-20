@@ -293,7 +293,12 @@ def stars_counter(data):
     Count total stars in repositories owned by me
     """
     total_stars = 0
-    for node in data: total_stars += node['node']['stargazers']['totalCount']
+    for node in data:
+        # GitHub's GraphQL API can return a null node for an edge (e.g. a transient
+        # per-node error) even on an HTTP 200 response. Skip those instead of crashing.
+        if node['node'] is None:
+            continue
+        total_stars += node['node']['stargazers']['totalCount']
     return total_stars
 
 
